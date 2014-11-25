@@ -5,7 +5,6 @@
 #include "hashMap.h"
 
 
-
 /*the first hashing function you can use*/
 int stringHash1(char * str)
 {
@@ -55,7 +54,7 @@ hashMap *createMap(int tableSize) {
  */
 void _freeMap (struct hashMap * ht)
 {  
-	/*write this*/		
+	/*write this*/	//todo
 }
 
 /* Deallocate buckets and the hash map.*/
@@ -89,7 +88,44 @@ void _setTableSize(struct hashMap * ht, int newTableSize)
  */
 void insertMap (struct hashMap * ht, KeyType k, ValueType v)
 {  
-	/*write this*/	
+    assert(ht);
+
+    hashLink *insertHere;
+
+	//compute hash and index
+    int index;
+    if(HASHING_FUNCTION == 1)
+        index = (stringHash1(k) + ht->tableSize) % ht->tableSize;
+    else
+        index = (stringHash2(k) + ht->tableSize) % ht->tableSize;;
+
+    if(containsKey(ht,k)){
+        hashLink *cur = ht->table[index];
+        while(cur && cur->key!=k) cur=cur->next;
+        assert(cur);
+        assert(cur->key==k);
+
+        cur->value = v;
+        return;
+    }
+
+    hashLink* chain = ht->table[index];
+    hashLink *newLink = malloc(sizeof(hashLink));
+    assert(newLink);
+
+    //setvalues for new link
+    newLink->key = k;
+    newLink->value = v;
+    newLink->next = chain;
+
+    //insert into table
+    ht->table[index] = newLink;
+    ht->count++;
+
+    //ensure proper load factor
+    if(((ht->count / (double) ht->tableSize) > LOAD_FACTOR_THRESHOLD))
+        _setTableSize(ht);
+
 }
 
 /*
