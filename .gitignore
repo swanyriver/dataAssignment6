@@ -1,0 +1,7 @@
+prog*
+
+*.o
+
+.cproject
+
+.project
