@@ -21,7 +21,7 @@ int main (int argc, const char * argv[]) {
 	struct hashMap *hashTable;	
 	int tableSize = 10;
 	clock_t timer;
-	FILE *fileptr;	
+	FILE *fileptr;
     /*
      this part is using command line arguments, you can use them if you wish
      but it is not required. DO NOT remove this code though, we will use it for
@@ -42,7 +42,24 @@ int main (int argc, const char * argv[]) {
 	hashTable = createMap(tableSize);	   
 	
     /*... concordance code goes here ...*/
-		
+	fileptr = fopen(filename, "r");
+
+	//read file
+	char* nextWord;
+	int* count;
+	int value;
+	while(( nextWord = getWord( fileptr ))){
+	    count = atMap(hashTable,nextWord);
+	    if(count){
+	        value = *count + 1;
+	    }else value=1;
+
+	    insertMap(hashTable, nextWord, value);
+	}
+
+	//display concordance results
+
+	fclose(fileptr);
 	/*... concordance code ends here ...*/
 
 	printMap(hashTable);

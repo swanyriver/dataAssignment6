@@ -149,8 +149,7 @@ void insertMap (struct hashMap *ht, KeyType k, ValueType v)
 
         //replace values in link
         cur->value = v;
-        //free passed in key
-        free(k);
+        free((char*) k);
         return;
     }
 
@@ -236,13 +235,18 @@ void removeKey (struct hashMap *ht, KeyType k)
     hashLink *bucket = ht->table[index];
     hashLink *prev = bucket;
     while(bucket){
-      if(strcmp(bucket->key, k) == 0){
+        if(strcmp(bucket->key, "the")==0){
+            printf("here it is");
+        }
+        if(strcmp(bucket->key, k) == 0){
           prev->next = bucket->next;
+          free(bucket->key);
           free(bucket);
+          if(bucket == ht->table[index]) ht->table[index]=NULL;
           return;
-      }
-      prev=bucket;
-      bucket=bucket->next;
+        }
+        prev=bucket;
+        bucket=bucket->next;
     }
     //key not found return with no effect
 }
