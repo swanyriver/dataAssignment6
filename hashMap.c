@@ -104,10 +104,11 @@ void _setTableSize(struct hashMap *ht, int newTableSize)
 	for(int i=0; i<ht->tableSize; i++){
 	    while(ht->table[i]){ //check for empty bucket or end of chain
 	        int newIndex = _hashedIndex(newTableSize,ht->table[i]->key);
+	        hashLink* next = ht->table[i]->next;
 	        ht->table[i]->next = temp[newIndex];
 	        temp[newIndex] = ht->table[i];
 
-	        ht->table[i] = ht->table[i]->next;
+	        ht->table[i] = next;
 	    }
 
 	}
@@ -235,9 +236,6 @@ void removeKey (struct hashMap *ht, KeyType k)
     hashLink *bucket = ht->table[index];
     hashLink *prev = bucket;
     while(bucket){
-        if(strcmp(bucket->key, "the")==0){
-            printf("here it is");
-        }
         if(strcmp(bucket->key, k) == 0){
           prev->next = bucket->next;
           free(bucket->key);

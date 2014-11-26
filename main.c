@@ -55,6 +55,7 @@ int main (int argc, const char * argv[]) {
 	    }else value=1;
 
 	    insertMap(hashTable, nextWord, value);
+
 	}
 
 	//display concordance results
