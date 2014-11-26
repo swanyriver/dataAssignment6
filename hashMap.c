@@ -48,13 +48,31 @@ hashMap *createMap(int tableSize) {
 	return ht;
 }
 
+
+//Helper function written by Brandon Swanson
+int _hashedIndex(int TSize, KeyType k){
+    if(HASHING_FUNCTION == 1)
+        return (stringHash1(k) + TSize) % TSize;
+    else
+        return (stringHash2(k) + TSize) % TSize;
+}
+
 /*
  Free all memory used by the buckets.
  Note: Before freeing up a hashLink, free the memory occupied by key and value
  */
 void _freeMap (struct hashMap * ht)
 {  
-	/*write this*/	//todo
+    assert(ht);
+
+    hashLink *bucket, *temp;
+    for(int i=0; i<ht->tableSize; i++){
+        bucket = ht->table[index];
+        while(bucket){
+            temp = bucket;
+            bucket = temp->next;
+            free(temp);
+        }
 }
 
 /* Deallocate buckets and the hash map.*/
@@ -71,7 +89,37 @@ Resizes the hash table to be the size newTableSize
 */
 void _setTableSize(struct hashMap * ht, int newTableSize)
 {
-	/*write this*/			
+	assert(ht);
+
+	int newTSize = ht->tableSize * 2;
+
+	//allocate new table and init
+	hashLink *temp = (hashLink*) malloc(sizeof(hashLink*)*newTableSize);
+	assert(temp);
+	for(int i=0;i<newTableSize;i++){
+	    temp[i] = NULL;
+	}
+
+	//move links to new table
+	for(int i=0; i<ht->tableSize; i++){
+	    while(ht->table[i]){ //check for empty bucket or end of chain
+	        int newIndex = _hashedIndex(newTableSize,ht->table[i]->key);
+	        ht->table[i]->next = temp[newIndex];
+	        temp[newIndex] = ht->table[i];
+
+	        ht->table[i] = ht->table[i]->next;
+	    }
+
+	}
+
+	//switch pointer update size//
+
+	struct hlink** remember = ht->table;
+
+	ht->table = temp;
+	ht->tableSize = newTableSize;
+
+	free(remember);
 }
 
 /*
@@ -93,18 +141,16 @@ void insertMap (struct hashMap * ht, KeyType k, ValueType v)
     hashLink *insertHere;
 
 	//compute hash and index
-    int index;
-    if(HASHING_FUNCTION == 1)
-        index = (stringHash1(k) + ht->tableSize) % ht->tableSize;
-    else
-        index = (stringHash2(k) + ht->tableSize) % ht->tableSize;;
+    int index = _hashedIndex(ht->tableSize,k);
 
     if(containsKey(ht,k)){
+        //find matching key
         hashLink *cur = ht->table[index];
         while(cur && cur->key!=k) cur=cur->next;
         assert(cur);
         assert(cur->key==k);
 
+        //replace values in link
         cur->value = v;
         return;
     }
@@ -138,8 +184,19 @@ void insertMap (struct hashMap * ht, KeyType k, ValueType v)
  */
 ValueType* atMap (struct hashMap * ht, KeyType k)
 { 
-	/*write this*/
-	return NULL;
+    assert(ht);
+
+    //compute hash and index
+    int index = _hashedIndex(ht->tableSize,k);
+
+    /*search for element*/
+    hashLink *bucket = ht->table[index];
+    while(bucket){
+      if(bucket->key == k)  return bucket->value;
+      bucket=bucket->next;
+    }
+    //key not found
+    return NULL;
 }
 
 /*
@@ -148,8 +205,19 @@ ValueType* atMap (struct hashMap * ht, KeyType k)
  */
 int containsKey (struct hashMap * ht, KeyType k)
 {  
-	/*write this*/
-	return 0;
+    assert(ht);
+
+    //compute hash and index
+    int index = _hashedIndex(ht->tableSize,k);
+
+    /*search for element*/
+    hashLink *bucket = ht->table[index];
+    while(bucket){
+      if(bucket->key == k)  return 1;
+      bucket=bucket->next;
+    }
+    //key not found
+    return NULL;
 }
 
 /*
@@ -160,7 +228,24 @@ int containsKey (struct hashMap * ht, KeyType k)
  */
 void removeKey (struct hashMap * ht, KeyType k)
 {  
-	/*write this*/	
+    assert(ht);
+
+    //compute hash and index
+    int index = _hashedIndex(ht->tableSize,k);
+
+    /*search for element*/
+    hashLink *prev = &ht->table[index];
+    hashLink *bucket = ht->table[index];
+    while(bucket){
+      if(bucket->key == k){
+          *prev = bucket->next;
+          free(bucket);
+          return;
+      }
+      prev=&bucket->next;
+      bucket=bucket->next;
+    }
+    //key not found return with no effect
 }
 
 /*
@@ -168,8 +253,16 @@ void removeKey (struct hashMap * ht, KeyType k)
  */
 int size (struct hashMap *ht)
 {  
-	/*write this*/
-	return 0;
+    assert(ht);
+    int numLinks = 0;
+	for(int i=0; i<ht->tableSize; i++){
+	    hashLink *bucket = ht->table[index];
+        while(bucket){
+            numLinks++;
+            bucket=bucket->next;
+        }
+	}
+	return numLinks;
 	
 }
 
@@ -178,8 +271,8 @@ int size (struct hashMap *ht)
  */
 int capacity(struct hashMap *ht)
 {  
-	/*write this*/
-	return 0;
+	assert(ht);
+	return ht->tableSize;
 }
 
 /*
@@ -188,8 +281,12 @@ int capacity(struct hashMap *ht)
  */
 int emptyBuckets(struct hashMap *ht)
 {  
-	/*write this*/
-	return 0;
+    assert(ht);
+    int numEmpty = 0;
+    for(int i=0; i<ht->tableSize; i++){
+        if(!ht->table[i]) numEmpty++;
+    }
+    return numEmpty;
 }
 
 /*
@@ -201,8 +298,8 @@ int emptyBuckets(struct hashMap *ht)
  */
 float tableLoad(struct hashMap *ht)
 {  
-	/*write this*/
-	return 0;
+    assert(ht);
+	return size(ht) / (double) ht->tableSize;
 }
 void printMap (struct hashMap * ht)
 {
