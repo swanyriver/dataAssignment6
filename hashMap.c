@@ -71,6 +71,7 @@ void _freeMap (struct hashMap *ht)
         while(bucket){
             temp = bucket;
             bucket = temp->next;
+            free(temp->key);
             free(temp);
         }
     }
@@ -143,12 +144,12 @@ void insertMap (struct hashMap *ht, KeyType k, ValueType v)
     if(containsKey(ht,k)){
         //find matching key
         hashLink *cur = ht->table[index];
-        while(cur && cur->key!=k) cur=cur->next;
+        while(cur && strcmp(cur->key, k)) cur=cur->next;
         assert(cur);
-        assert(cur->key==k);
 
         //replace values in link
         cur->value = v;
+        free(k);
         return;
     }
 
@@ -189,7 +190,7 @@ ValueType* atMap (struct hashMap *ht, KeyType k)
     /*search for element*/
     hashLink *bucket = ht->table[index];
     while(bucket){
-      if(bucket->key == k)  return &(bucket->value);
+      if(strcmp(bucket->key, k) == 0)  return &(bucket->value);
       bucket=bucket->next;
     }
     //key not found
@@ -210,7 +211,7 @@ int containsKey (struct hashMap *ht, KeyType k)
     /*search for element*/
     hashLink *bucket = ht->table[index];
     while(bucket){
-      if(bucket->key == k)  return 1;
+      if(strcmp(bucket->key, k) == 0)  return 1;
       bucket=bucket->next;
     }
     //key not found
@@ -234,7 +235,7 @@ void removeKey (struct hashMap *ht, KeyType k)
     hashLink *bucket = ht->table[index];
     hashLink *prev = bucket;
     while(bucket){
-      if(bucket->key == k){
+      if(strcmp(bucket->key, k) == 0){
           prev->next = bucket->next;
           free(bucket);
           return;
