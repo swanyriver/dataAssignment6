@@ -149,6 +149,7 @@ void insertMap (struct hashMap *ht, KeyType k, ValueType v)
 
         //replace values in link
         cur->value = v;
+        //free passed in key
         free(k);
         return;
     }
