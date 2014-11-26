@@ -239,7 +239,7 @@ void removeKey (struct hashMap *ht, KeyType k)
           free(bucket);
           return;
       }
-      prev=bucket->next;
+      prev=bucket;
       bucket=bucket->next;
     }
     //key not found return with no effect
