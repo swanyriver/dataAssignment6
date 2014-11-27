@@ -59,6 +59,12 @@ int main (int argc, const char * argv[]) {
 	}
 
 	//display concordance results
+	hashLink *lnk;
+    for(int i=0; i<hashTable->tableSize; i++){
+        for(lnk = hashTable->table[i]; lnk; lnk=lnk->next){
+            printf("%s: %d\n", lnk->key,lnk->value);
+        }
+    }
 
 	fclose(fileptr);
 	/*... concordance code ends here ...*/
