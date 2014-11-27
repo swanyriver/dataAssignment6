@@ -300,7 +300,7 @@ int emptyBuckets(struct hashMap *ht)
 float tableLoad(struct hashMap *ht)
 {  
     assert(ht);
-	return size(ht) / (double) ht->tableSize;
+    return size(ht) / (double) ht->tableSize;
 }
 
 void printMap (struct hashMap *ht)
