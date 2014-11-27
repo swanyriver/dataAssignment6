@@ -17,6 +17,11 @@
  */
 char* getWord(FILE *file);
 
+///to allow compilation
+void printValue(ValueType v) {
+    printf("Value:%d",(int *)v);
+}
+
 /*
  Load the contents of file into hashmap ht
  */
@@ -27,7 +32,7 @@ int main (int argc, const char * argv[]) {
   struct hashMap* hashTable;
   int tableSize = 1000;
   timer = clock();
-  initMap(hashTable,tableSize);
+  hashTable = createMap(tableSize);
   
   FILE* dictionary;
   
@@ -45,6 +50,11 @@ int main (int argc, const char * argv[]) {
       ... You write this               ...
     */
     
+    if(containsKey(hashTable,word))
+        printf("Good Job, \"%s\" is spelled correctly\n", word);
+    else printf("Uh-Oh, \"%s\" is spelled incorrectly\n", word);
+
+
     /* Don't remove this. It is used for grading*/
     if(strcmp(word,"quit")==0)
       quit=!quit;
@@ -56,7 +66,12 @@ int main (int argc, const char * argv[]) {
 
 void loadDictionary(FILE* file, struct hashMap* ht)
 {
-  /* You will write this*/
+    file = fopen("dictionary.txt","r");
+
+    char* nextWord;
+    while(( nextWord = getWord( file ))){
+        insertMap(ht, nextWord, 0);
+    }
 }
 
 char* getWord(FILE *file)
