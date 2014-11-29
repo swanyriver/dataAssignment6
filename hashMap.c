@@ -235,16 +235,19 @@ void removeKey (struct hashMap *ht, KeyType k)
     /*search for element*/
     hashLink *bucket = ht->table[index];
     hashLink *prev = bucket;
+    hashLink **link = &bucket;
     while(bucket){
         if(strcmp(bucket->key, k) == 0){
-           if(bucket == ht->table[index])
-              ht->table[index]=ht->table[index]->next;
-           else prev->next = bucket->next;
+           //if(bucket == ht->table[index])
+           //   ht->table[index]=ht->table[index]->next;
+           //else prev->next = bucket->next;
+           *(link) = bucket->next;
            free(bucket->key);
            free(bucket);
            return;
         }
         prev=bucket;
+        link = &bucket->next;
         bucket=bucket->next;
     }
     //key not found return with no effect
