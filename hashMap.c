@@ -237,11 +237,12 @@ void removeKey (struct hashMap *ht, KeyType k)
     hashLink *prev = bucket;
     while(bucket){
         if(strcmp(bucket->key, k) == 0){
-          prev->next = bucket->next;
-          free(bucket->key);
-          free(bucket);
-          if(bucket == ht->table[index]) ht->table[index]=NULL;
-          return;
+           if(bucket == ht->table[index])
+              ht->table[index]=ht->table[index]->next;
+           else prev->next = bucket->next;
+           free(bucket->key);
+           free(bucket);
+           return;
         }
         prev=bucket;
         bucket=bucket->next;
